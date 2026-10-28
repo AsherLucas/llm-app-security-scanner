@@ -1,0 +1,23 @@
+name: "LLM App Security Scan"
+description: "Statically scan an LLM/agent repo for shell, secret, and untrusted-input risks."
+branding:
+  icon: "shield"
+  color: "red"
+inputs:
+  path:
+    description: "Directory to scan"
+    required: false
+    default: "."
+  fail-on:
+    description: "Minimum severity that fails the gate"
+    required: false
+    default: "high"
+runs:
+  using: "composite"
+  steps:
+    - name: Run scanner
+      shell: bash
+      run: |
+        pip install .
+        llm-scan scan "${{ inputs.path }}" --fail-on "${{ inputs.fail-on }}" --format sarif > report.sarif || echo "gate-failed=true" >> "$GITHUB_ENV"
+        cat report.sarif
