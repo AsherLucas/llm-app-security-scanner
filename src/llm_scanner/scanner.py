@@ -45,7 +45,7 @@ def _suppressed(finding, rules, root: Path) -> bool:
 
 
 def scan_path(root: str | Path, exclude: list[str] | None = None) -> ScanResult:
-    """Scan a directory tree (Python files, plus .env/.cfg/.ini/.yaml/.yml for secrets)."""
+    """Scan a directory tree (Python + JS/TS files, plus .env/.cfg/.ini/.yaml/.yml for secrets)."""
     root = Path(root)
     excludes = set(DEFAULT_EXCLUDES) | set(exclude or [])
     files: list[Path] = []
@@ -59,7 +59,7 @@ def scan_path(root: str | Path, exclude: list[str] | None = None) -> ScanResult:
                 continue
             if any(part in excludes for part in path.parts):
                 continue
-            if path.suffix in (".py", ".env") or path.name in (".env",) or path.suffix in (".cfg", ".ini", ".yaml", ".yml", ".toml"):
+            if path.suffix in (".py", ".env", ".js", ".ts", ".mjs", ".cjs", ".jsx", ".tsx") or path.name in (".env",) or path.suffix in (".cfg", ".ini", ".yaml", ".yml", ".toml"):
                 # Secret checks only apply to non-Python config files; AST checks are .py only.
                 files.append(path)
     rules = load_suppressions(scan_root)

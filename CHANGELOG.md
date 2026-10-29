@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.2.0] — 2026-10-29
+
+### Added
+
+- JS/TS checks: JS001 eval(), JS002 child_process exec/execSync/spawnSync, JS003 new Function(), with examples/js/vulnerable.js and a regression test.
+
 ## Unreleased
 - Real CI in `.github/workflows/ci.yml`: pytest on Python 3.11/3.12,
   vulnerable example must fail the gate, fixed example must pass,

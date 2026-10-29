@@ -252,4 +252,17 @@ def scan_file(path: Path) -> list[Finding]:
         visitor = _Visitor(path, lines)
         visitor.visit(tree)
         findings.extend(visitor.findings)
+
+    # JS/TS checks: text-level, deliberately narrow (eval / child_process / Function)
+    if path.suffix in (".js", ".ts", ".mjs", ".cjs", ".jsx", ".tsx"):
+        js_patterns = [
+            (r"\beval\s*\(", "JS001", "high", "high", "eval() executes a string as code; prefer structured parsing / allowlisted dispatch."),
+            (r"child_process.*\.\s*(exec|execSync|spawnSync)\s*\(", "JS002", "high", "high", "child_process shell execution; prefer execFile/spawn with an argument array and no shell."),
+            (r"\bnew\s+Function\s*\(", "JS003", "high", "medium", "new Function() executes a string as code, like eval(); prefer a real function."),
+        ]
+        for i, line in enumerate(lines, start=1):
+            for pattern, check_id, sev, conf, msg in js_patterns:
+                if re.search(pattern, line):
+                    findings.append(_finding(check_id, sev, conf, path, i, msg))
+                    break
     return findings
