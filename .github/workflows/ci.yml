@@ -1,0 +1,43 @@
+name: CI
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  test-examples-dogfood:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install ".[dev]"
+      - run: python -m pytest -q
+      - name: Vulnerable example must fail the gate (exit 1)
+        run: |
+          set +e
+          llm-scan scan examples/vulnerable
+          code=$?
+          if [ "$code" -ne 1 ]; then
+            echo "expected exit 1 from the vulnerable example, got $code"
+            exit 1
+          fi
+      - name: Fixed example must pass the gate (exit 0)
+        run: llm-scan scan examples/fixed
+      - name: Adversarial pack (stub agents only)
+        run: llm-scan adversarial
+      # Dogfood: scan the scanner's own production code (src/).
+      # The whole repo is NOT the dogfood gate on purpose: tests/
+      # contain intentional secret-literal fixtures and
+      # examples/vulnerable/ is deliberately vulnerable, so a
+      # whole-repo scan is expected to fail and would teach
+      # nothing. src/ must stay clean.
+      - name: Dogfood — scan own production code, keep SARIF
+        run: llm-scan scan src --format sarif > dogfood.sarif
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dogfood-sarif-${{ matrix.python-version }}
+          path: dogfood.sarif

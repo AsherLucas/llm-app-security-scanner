@@ -18,6 +18,7 @@ runs:
     - name: Run scanner
       shell: bash
       run: |
-        pip install .
+        # Install from the action's own checkout, not the consumer repo.
+        pip install "${{ github.action_path }}"
         llm-scan scan "${{ inputs.path }}" --fail-on "${{ inputs.fail-on }}" --format sarif > report.sarif || echo "gate-failed=true" >> "$GITHUB_ENV"
         cat report.sarif

@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -7,19 +7,26 @@ name = "llm-app-security-scanner"
 version = "0.1.0"
 description = "Static security scanner for LLM/agent repos: shell, file-write, secret, and untrusted-input risks as a CI gate, with SARIF output."
 readme = "README.md"
-license = { text = "MIT" }
+license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.11"
 authors = [{ name = "AsherLucas" }]
 keywords = ["llm", "agent", "security", "prompt-injection", "sarif", "ci"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Topic :: Security",
     "Topic :: Software Development :: Testing",
 ]
-dependencies = []
+dependencies = ["PyYAML>=6.0"]
+
+[project.urls]
+Homepage = "https://github.com/AsherLucas/llm-app-security-scanner"
+Repository = "https://github.com/AsherLucas/llm-app-security-scanner"
+Issues = "https://github.com/AsherLucas/llm-app-security-scanner/issues"
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]

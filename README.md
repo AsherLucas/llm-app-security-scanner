@@ -82,12 +82,24 @@ third-party system was probed):
 
 ## CI
 
-See `docs/ci-workflow-example.yml` for a documented GitHub Actions workflow
-you can copy into `.github/workflows/` **yourself**. It is deliberately kept
-in `docs/`, not in `.github/workflows/` in this repo's first push, so the
-initial push does not require a token with workflow scope. The workflow
-runs the scanner, uploads the SARIF file to GitHub code scanning, and
-fails the job on gate failures.
+This repo now has real workflows in `.github/workflows/`:
+
+- `ci.yml` — on push/PR, runs the test suite on Python 3.11 and 3.12,
+  checks that the vulnerable example fails the gate (exit 1) and the
+  fixed example passes (exit 0), runs the adversarial pack, and runs
+  the scanner on its own production code (`src/`) as a dogfood check,
+  keeping the SARIF as an artifact. The whole repo is deliberately
+  *not* the dogfood gate: `tests/` contain intentional secret-literal
+  fixtures and `examples/vulnerable/` is deliberately vulnerable.
+- `publish.yml` — publishes to PyPI on version tags via Trusted
+  Publishing (OIDC, no stored token). It is prepared, not yet used:
+  no release has been tagged and nothing has been uploaded to PyPI
+  yet; a PyPI account with 2FA and a pending Trusted Publisher for
+  this repo/workflow are still required first.
+
+See also `docs/ci-workflow-example.yml` for a documented GitHub Actions
+workflow you can copy for your own repo, including uploading SARIF to
+GitHub code scanning.
 
 An `action.yml` wrapper is included at the repo root for use as
 `uses: AsherLucas/llm-app-security-scanner@v0.1.0` once a release exists.
